@@ -16,22 +16,21 @@ The initial code provides 6 states as an enumeration and its transitions. These 
 7. Integrate `visdom` for real-time plotting
 
 # Result
-As the result, I present the pose, altitute plot, and the video:
+As the result, I present the pose and altitute plot.
 
 | Pose | Altitute |
 |:--:|:--:|
 |![alt text][pose_img]|![alt text][alt_img]|
 
-![Result video][res_vid]
+The animated gif below shows the real-time plotting during the flight:
 
-
-<video style="width:60%" controls>
-  <source src="./imgs/result.webm" type="video/webm">
-Your browser does not support the video tag.
-</video>
+<p align="center">
+<a href="./imgs/fcnd_p1_5fps.gif" target="_blank"><img src="./imgs/fcnd_p1_5fps.gif" 
+alt="Flight result" border="5" /></a>
+</p>
 
 [//]: # (References)
 [pose_img]: ./imgs/pose_plot.png
 [alt_img]: ./imgs/alt_plot.png
 [sm_img]: ./imgs/statemachine.png
-[res_vid]: ./imgs/result.webm
+[res_gif]: ./imgs/fcnd_p1_5fps.gif
