@@ -3,6 +3,7 @@ import time
 from enum import Enum
 
 import numpy as np
+import visdom   #for realtime plot
 
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection, WebSocketConnection  # noqa: F401
@@ -30,10 +31,35 @@ class BackyardFlyer(Drone):
         # initial state
         self.flight_state = States.MANUAL
 
-        # TODO: Register all your callbacks here
+        # TODO: implemented
         self.register_callback(MsgID.LOCAL_POSITION, self.local_position_callback)
         self.register_callback(MsgID.LOCAL_VELOCITY, self.velocity_callback)
         self.register_callback(MsgID.STATE, self.state_callback)
+
+
+        # For Plotting
+        self.register_callback(MsgID.LOCAL_POSITION, self.update_ne_plot)
+        self.register_callback(MsgID.LOCAL_POSITION, self.update_d_plot)
+        
+        # default opens up to http://localhost:8097
+        self.v = visdom.Visdom()
+        assert self.v.check_connection()
+        # Plot NE
+        ne = np.array([self.local_position[0], self.local_position[1]]).reshape(1, -1)
+        self.ne_plot = self.v.scatter(ne, opts=dict(
+            title="Local position (north, east)", 
+            xlabel='North', 
+            ylabel='East'
+        ))
+
+        # Plot D
+        d = np.array([self.local_position[2]])
+        self.t = 0
+        self.d_plot = self.v.line(d, X=np.array([self.t]), opts=dict(
+            title="Altitude (meters)", 
+            xlabel='Timestep', 
+            ylabel='Down'
+        ))
 
     def local_position_callback(self):
         """
@@ -48,12 +74,13 @@ class BackyardFlyer(Drone):
 
             # check if altitude is within 95% of target
             if altitude > 0.95 * self.target_position[2]:
+                #start the mission
                 self.calculate_box()
                 self.waypoint_transition()
 
     def velocity_callback(self):
         """
-        TODO: Implement this method
+        TODO: Implemented
 
         This triggers when `MsgID.LOCAL_VELOCITY` is received and self.local_velocity contains new data
         """
@@ -139,10 +166,17 @@ class BackyardFlyer(Drone):
 
         # check if current location near the nord location
         #calculate the distance
-        print("local pose: ", self.local_position[:2])
+        print("local pose: ", self.local_position[:3])
         print("next waypoint: ", self.all_waypoints[0][:2])
         dist = np.linalg.norm(self.local_position[:2]-self.all_waypoints[0][:2])
         print("Distance: ", dist)
+
+        if self.flight_state != States.WAYPOINT:
+            self.flight_state = States.WAYPOINT
+            
+        if dist > 1000000:
+            print("Something is wrong,")
+
 
         if dist > dist_treshold:
             self.target_position = self.all_waypoints[0]
@@ -151,7 +185,7 @@ class BackyardFlyer(Drone):
                             self.target_position[1],
                             self.target_position[2],
                             self.target_position[3])
-            self.flight_state = States.WAYPOINT
+            
         else:
             #target reached, remove the current target waypoint
             self.all_waypoints.pop(0)
@@ -218,6 +252,15 @@ class BackyardFlyer(Drone):
         print("Closing log file")
         self.stop_log()
 
+    def update_ne_plot(self):
+        ne = np.array([self.local_position[0], self.local_position[1]]).reshape(1, -1)
+        self.v.scatter(ne, win=self.ne_plot, update='append')
+
+    def update_d_plot(self):
+        d = np.array([self.local_position[2] * -1]) #multiply with -1 to get an inverted value
+        # update timestep
+        self.t += 1
+        self.v.line(d, X=np.array([self.t]), win=self.d_plot, update='append')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
