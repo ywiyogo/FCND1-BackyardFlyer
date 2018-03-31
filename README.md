@@ -10,8 +10,9 @@ The initial code provides 6 states as an enumeration and its transitions. These 
 2. Implement the functionality until the drone can takeoff
 3. Implement the forward flying
 4. Implement the square waypoints 
-5. Create a state machine, like this:
-![State Machine][sm_img]
+5. Create a state machine:
+
+    ![State Machine][sm_img]
 6. Testing and bug fixing
 7. Integrate `visdom` for real-time plotting
 
