@@ -24,7 +24,10 @@ As the result, I present the pose, altitute plot, and the video:
 
 ![Result video][res_vid]
 
-<video src="./imgs/result.webm" width="960">
+
+<video style="width:60%" controls>
+  <source src="./imgs/result.webm" type="video/webm">
+Your browser does not support the video tag.
 </video>
 
 [//]: # (References)
