@@ -24,6 +24,9 @@ As the result, I present the pose, altitute plot, and the video:
 
 ![Result video][res_vid]
 
+<video src="./imgs/result.webm" width="960">
+</video>
+
 [//]: # (References)
 [pose_img]: ./imgs/pose_plot.png
 [alt_img]: ./imgs/alt_plot.png
